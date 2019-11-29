@@ -1,16 +1,18 @@
 import React from 'react';
-import { Router, Route, Switch } from 'react-router-dom';
-import Feed from './Views/Feed/Feed';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import Blog from './Views/Blog/Blog';
+import Panel from './Views/Panel/Panel';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <Router>
+      <BrowserRouter>
         <Switch>
-          <Route path="/" component={Feed} />
+          <Route path="/panel" component={Panel} />
+          <Route path="/" component={Blog} />
         </Switch>
-      </Router>
+      </BrowserRouter>
     </div>
   );
 }
