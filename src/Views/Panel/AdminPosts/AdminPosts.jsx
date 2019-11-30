@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Link from '@material-ui/core/Link';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from '../../../Components/Title/Title';
@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import axios from 'axios';
 import Loader from 'react-loader-spinner';
 import _ from 'lodash';
-
-function preventDefault(event) {
-  event.preventDefault();
-}
+import './AdminPosts.scss';
 
 const useStyles = makeStyles({
   depositContext: {
@@ -28,6 +25,10 @@ const AdminPosts = props => {
   const [loading, setLoading] = useState(false);
   const classes = useStyles();
 
+  useEffect(() => {
+    fetchPosts();
+  }, [])  
+
   const fetchPosts = async () => {
     setLoading(true);
     try {
@@ -39,10 +40,6 @@ const AdminPosts = props => {
     }
   }
 
-  useEffect(() => {
-    fetchPosts();
-  }, [])
-
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
@@ -50,7 +47,7 @@ const AdminPosts = props => {
       {
         posts && !loading
           ? _.map(posts, ({ title, date, id }) => (
-            <Grid item xs={12} md={6} lg={6} key={id}>
+            <Grid item xs={12} md={6} lg={6} key={id} className='post'>
               <Paper className={fixedHeightPaper}>
                 <Title>Post</Title>
                 <Typography component="p" variant="h4">
@@ -67,10 +64,13 @@ const AdminPosts = props => {
                     }).format(new Date(date)) 
                   }
                 </Typography>
-                <div>
-                  <Link color="primary" href="#" onClick={preventDefault}>
+                <div className="post-actions">
+                  <Link to={'/panel/add-post?editing=true&postId=' + id}>
                     Edit
-              </Link>
+                  </Link>
+                  <Link to='#'>
+                    Delete
+                  </Link>
                 </div>
               </Paper>
             </Grid>

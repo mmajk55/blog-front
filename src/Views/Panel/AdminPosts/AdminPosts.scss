@@ -1,0 +1,11 @@
+.post {
+    .post-actions {
+        a {
+            color: #3f51b5;
+            margin-right: 10px;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}
