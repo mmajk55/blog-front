@@ -17,7 +17,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link color="inherit" href="/">
+      <Link color="inherit" to="/">
         Your Website
       </Link>{' '}
       {new Date().getFullYear()}
@@ -41,16 +41,6 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(1),
     flexShrink: 0,
   },
-  mainFeaturedPost: {
-    position: 'relative',
-    backgroundColor: theme.palette.grey[800],
-    color: theme.palette.common.white,
-    marginBottom: theme.spacing(4),
-    backgroundImage: 'url(https://source.unsplash.com/user/erondu)',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'center',
-  },
   overlay: {
     position: 'absolute',
     top: 0,
@@ -59,36 +49,12 @@ const useStyles = makeStyles(theme => ({
     left: 0,
     backgroundColor: 'rgba(0,0,0,.3)',
   },
-  mainFeaturedPostContent: {
-    position: 'relative',
-    padding: theme.spacing(3),
-    [theme.breakpoints.up('md')]: {
-      padding: theme.spacing(6),
-      paddingRight: 0,
-    },
-  },
   mainGrid: {
     marginTop: theme.spacing(3),
-  },
-  card: {
-    display: 'flex',
-  },
-  cardDetails: {
-    flex: 1,
-  },
-  cardMedia: {
-    width: 160,
   },
   markdown: {
     ...theme.typography.body2,
     padding: theme.spacing(3, 0),
-  },
-  sidebarAboutBox: {
-    padding: theme.spacing(2),
-    backgroundColor: theme.palette.grey[200],
-  },
-  sidebarSection: {
-    marginTop: theme.spacing(3),
   },
   footer: {
     backgroundColor: theme.palette.background.paper,
@@ -140,7 +106,7 @@ const Blog = props => {
           {/* Sub featured posts */}
           <Grid container spacing={4}>
             <Switch>
-              <Route path='/post' component={Post} />
+              <Route path='/post/:id' component={Post} />
               <Route path='/signup' component={Signup} />
               <Route path='/login' component={Login} />
               <Route path='/' component={FeaturedPosts} />

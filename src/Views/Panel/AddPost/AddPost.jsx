@@ -109,8 +109,8 @@ const AddPost = props => {
           id="standard-full-width"
           placeholder="Content"
           multiline={true}
-          rows={2}
-          rowsMax={4}
+          rows={5}
+          rowsMax={10}
           style={{ margin: 8 }}
           fullWidth
           margin="normal"

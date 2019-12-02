@@ -1,23 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
+import axios from 'axios';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 
 const Post = props => {
+  const [post, setPost] = useState(undefined);
+  const [postId, setPostId] = useState(undefined);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const { match } = props;
+    const id = _.get(match, 'params.id');
+    setPostId(id);
+    getPost();
+  }, [postId])
+
+  const getPost = async () => {
+    setLoading(true);
+    try {
+      if (!_.isEmpty(postId)) {
+        const { data: { post } } = await axios.get(`http://localhost:8000/blog/post/${postId}`);
+        setLoading(false);
+        setPost(post);
+      }
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    }
+  }
 
   return (
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="lg">
         <Typography component="h2" variant="h5">
-          Featured post
+          {!_.isEmpty(post) &&
+            post.title
+          }
         </Typography>
         <Typography variant="subtitle1" color="textSecondary">
-          Nov 12
+          {!_.isEmpty(post) &&
+            new Intl.DateTimeFormat('en-EN', {
+              year: 'numeric',
+              month: 'long',
+              day: '2-digit'
+            }).format(new Date(post.date))
+          }
         </Typography>
         <Typography variant="subtitle1" paragraph>
-          This is a wider card with supporting text below as a natural lead-in to additional content.',
+          {!_.isEmpty(post) &&
+            post.content
+          }
         </Typography>
       </Container>
     </React.Fragment>

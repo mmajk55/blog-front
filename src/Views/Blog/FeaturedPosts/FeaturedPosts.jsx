@@ -1,25 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import _ from 'lodash';
+import axios from 'axios';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-
-const featuredPosts = [
-  {
-    title: 'Featured post',
-    date: 'Nov 12',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-  },
-  {
-    title: 'Post title',
-    date: 'Nov 11',
-    description:
-      'This is a wider card with supporting text below as a natural lead-in to additional content.',
-  },
-];
+import Loader from 'react-loader-spinner';
 
 const useStyles = makeStyles(theme => ({
   toolbar: {
@@ -69,34 +57,75 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const FeaturedPosts = props => {
+  const [posts, setPosts] = useState(undefined);
+  const [loading, setLoading] = useState(false);
   const classes = useStyles();
+
+  useEffect(() => {
+    fetchPosts();
+  }, [])
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const { data: { posts } } = await axios.get('http://localhost:8000/blog/posts');
+      setPosts(posts);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   return (
     <React.Fragment>
-      {featuredPosts.map(post => (
-        <Grid item key={post.title} xs={12} md={6}>
-          <CardActionArea href="/post">
-            <Card className={classes.card}>
-              <div className={classes.cardDetails}>
-                <CardContent>
-                  <Typography component="h2" variant="h5">
-                    {post.title}
+      {
+        posts && !loading
+          ? _.map(posts, ({ title, content, date, id }) => (
+            <Grid item key={id} xs={12} md={6}>
+              <CardActionArea href={`/post/${id}`}>
+                <Card className={classes.card}>
+                  <div className={classes.cardDetails}>
+                    <CardContent>
+                      <Typography component="h2" variant="h5">
+                        {!_.isEmpty(title) &&
+                          title
+                        }
+                      </Typography>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        {!_.isEmpty(date) &&
+                          new Intl.DateTimeFormat('en-EN', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: '2-digit'
+                          }).format(new Date(date))
+                        }
+                      </Typography>
+                      <Typography variant="subtitle1" paragraph>
+                        {!_.isEmpty(content) &&
+                          _.truncate(content, {
+                            'length': 50,
+                            'separator': ' '
+                          })
+                        }
+                      </Typography>
+                      <Typography variant="subtitle1" color="primary">
+                        Continue reading...
                   </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    {post.date}
-                  </Typography>
-                  <Typography variant="subtitle1" paragraph>
-                    {post.description}
-                  </Typography>
-                  <Typography variant="subtitle1" color="primary">
-                    Continue reading...
-                  </Typography>
-                </CardContent>
-              </div>
-            </Card>
-          </CardActionArea>
-        </Grid>
-      ))}
+                    </CardContent>
+                  </div>
+                </Card>
+              </CardActionArea>
+            </Grid>
+          ))
+          : <Grid item xs={12}>
+            <Loader
+              type="Oval"
+              color="#00BFFF"
+              height={100}
+              width={100}
+            />
+          </Grid>
+      }
     </React.Fragment>
   )
 }
