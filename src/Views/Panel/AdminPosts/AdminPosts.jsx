@@ -32,8 +32,19 @@ const AdminPosts = props => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const { data: {posts} } = await axios.get('http://localhost:8000/blog/posts');
+      const { data: { posts } } = await axios.get('http://localhost:8000/blog/posts');
       setPosts(posts);
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const deletePost = async (postId) => {
+    setLoading(true);
+    try {
+      await axios.delete(`http://localhost:8000/blog/delete-post/${postId}`);
+      setPosts(prevState => prevState.filter(post => post.id !== postId));
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -65,10 +76,10 @@ const AdminPosts = props => {
                   }
                 </Typography>
                 <div className="post-actions">
-                  <Link to={'/panel/add-post?editing=true&postId=' + id}>
+                  <Link to={`/panel/add-post?editing=true&postId=${id}`}>
                     Edit
                   </Link>
-                  <Link to='#'>
+                  <Link to='#' onClick={() => deletePost(id)}>
                     Delete
                   </Link>
                 </div>

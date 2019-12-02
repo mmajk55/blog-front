@@ -34,6 +34,7 @@ const AddPost = props => {
     const { editing, postId } = paramsString;
     setEditing(editing); 
     setPostId(postId);
+    getPost(postId);
   }, [props.location.search])
 
   const classes = useStyles();
@@ -49,10 +50,11 @@ const AddPost = props => {
   const addPost = async () => {
     setLoading(true);
     try {
-      await axios.put('http://localhost:8000/blog/update-post', { title, content });
+      await axios.post('http://localhost:8000/blog/post', { title, content });
       setLoading(false);
       setContent('');
       setTitle('');
+      props.history.push('/panel/dashboard');
     } catch (err) {
       setLoading(false);
       console.log(err);
@@ -62,10 +64,24 @@ const AddPost = props => {
   const updatePost = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:8000/blog/post', { title, content });
+      await axios.put(`http://localhost:8000/blog/update-post/${postId}`, { title, content });
       setLoading(false);
-      setContent('');
-      setTitle('');
+      props.history.push('/panel/dashboard');
+    } catch (err) {
+      setLoading(false);
+      console.log(err);
+    }
+  }
+
+  const getPost = async postId => {
+    setLoading(true);
+    try {
+      const { data: { post } } = await axios.get(`http://localhost:8000/blog/post/${postId}`);
+      const title = _.get(post, 'title');
+      const content = _.get(post, 'content');
+      setLoading(false);
+      setContent(content);
+      setTitle(title);
     } catch (err) {
       setLoading(false);
       console.log(err);
