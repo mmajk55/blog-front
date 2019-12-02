@@ -50,7 +50,12 @@ const AddPost = props => {
   const addPost = async () => {
     setLoading(true);
     try {
-      await axios.post('http://localhost:8000/blog/post', { title, content });
+      await axios.post('http://localhost:8000/blog/post', 
+        { title, content },
+        { headers: {
+          Authorization: 'Bearer ' + props.token
+        }}
+      );
       setLoading(false);
       setContent('');
       setTitle('');

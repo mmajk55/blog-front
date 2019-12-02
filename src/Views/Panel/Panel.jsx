@@ -1,5 +1,6 @@
-import React from 'react';
-import { Route, Link, Switch } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Route, Link, Switch, Redirect } from 'react-router-dom';
+import _ from 'lodash';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -116,7 +117,12 @@ const useStyles = makeStyles(theme => ({
 
 const Panel = props => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+
+  useEffect(() => {
+    console.log(props.token);
+  }, [])
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -175,8 +181,16 @@ const Panel = props => {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Switch>
-            <Route exact path="/panel/dashboard" component={AdminPosts} />
-            <Route exact path="/panel/add-post" component={AddPost} />
+            <Route exact path="/panel/dashboard" render={cmpProps => (
+              props.token
+                ? <AdminPosts {...cmpProps} token={props.token}/>
+                : <Redirect to='/login' />
+            )} />
+            <Route exact path="/panel/add-post" render={cmpProps => (
+              props.token
+                ? <AddPost {...cmpProps} token={props.token}/>
+                : <Redirect to='/login' />
+            )} />
           </Switch>
           <Box pt={4}>
             <Copyright />

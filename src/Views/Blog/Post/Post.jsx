@@ -9,7 +9,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 const Post = props => {
   const [post, setPost] = useState(undefined);
   const [postId, setPostId] = useState(undefined);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const { match } = props;
@@ -19,15 +18,12 @@ const Post = props => {
   }, [postId])
 
   const getPost = async () => {
-    setLoading(true);
     try {
       if (!_.isEmpty(postId)) {
         const { data: { post } } = await axios.get(`http://localhost:8000/blog/post/${postId}`);
-        setLoading(false);
         setPost(post);
       }
     } catch (err) {
-      setLoading(false);
       console.log(err);
     }
   }
