@@ -125,18 +125,18 @@ const AddPost = props => {
         {
           editing
             ? <Button
-              variant="contained"
-              color="primary"
-              style={{ margin: 8 }}
-              onClick={updatePost}>
-              Update Post
+                variant="contained"
+                color="primary"
+                style={{ margin: 8 }}
+                onClick={updatePost}>
+                Update Post
             </Button>
             : <Button
-              variant="contained"
-              color="primary"
-              style={{ margin: 8 }}
-              onClick={addPost}>
-              Add Post
+                variant="contained"
+                color="primary"
+                style={{ margin: 8 }}
+                onClick={addPost}>
+                Add Post
           </Button>
         }
         {
