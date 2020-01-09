@@ -1,24 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Router, Route, Switch } from "react-router-dom";
+import { authorizationActions } from './Views/Auth/duck';
+import history from "./history";
+import _ from "lodash";
+import Blog from "./Views/Blog/Blog";
+import Panel from "./Views/Panel/Panel";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const { token, expiryDate} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (expiryDate) {
+      const remainingMilliseconds =
+      new Date(expiryDate).getTime() - new Date().getTime();
+      setTimeout(() => {
+        dispatch(authorizationActions.logout());
+        history.push('/')
+      }, remainingMilliseconds);
+    }
+  }, [expiryDate]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router history={history}>
+        <Switch>
+          {token && <Route path="/panel" component={Panel} />}
+          <Route path="/" component={Blog} />
+        </Switch>
+      </Router>
     </div>
   );
 }
