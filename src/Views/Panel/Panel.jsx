@@ -19,7 +19,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import { mainListItems } from './Sidebar/Sidebar';
 import AdminPosts from './AdminPosts/AdminPosts';
-import AddPost from './AddPost/AddPost';
+import AddPost from './AddEditPost/AddEditPost';
 
 function Copyright() {
   return (
@@ -119,10 +119,6 @@ const Panel = props => {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
 
-  useEffect(() => {
-    console.log(props.token);
-  }, [])
-
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -152,11 +148,6 @@ const Panel = props => {
               Home
             </Typography>
           </Link>
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -181,16 +172,8 @@ const Panel = props => {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Switch>
-            <Route exact path="/panel/dashboard" render={cmpProps => (
-              props.token
-                ? <AdminPosts {...cmpProps} token={props.token}/>
-                : <Redirect to='/login' />
-            )} />
-            <Route exact path="/panel/add-post" render={cmpProps => (
-              props.token
-                ? <AddPost {...cmpProps} token={props.token}/>
-                : <Redirect to='/login' />
-            )} />
+            <Route exact path="/panel/add-post" component={AddPost} />
+            <Route path="/panel" component={AdminPosts} />
           </Switch>
           <Box pt={4}>
             <Copyright />

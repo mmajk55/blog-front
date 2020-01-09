@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { useDispatch, useSelector } from 'react-redux';
+import { authorizationActions } from '../duck';
 import _ from 'lodash';
-import axios from 'axios';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -11,7 +13,6 @@ import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import Fade from '@material-ui/core/Fade';
@@ -43,51 +44,38 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const SignUp = props => {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(undefined);
+const SignUp = () => {
+  const [signupState, setSignupState] = useState({
+    email: undefined,
+    firstName: undefined,
+    lastName: undefined,
+    password: undefined,
+  });
   const [displayError, setDisplayError] = React.useState({
     open: false,
     Transition: Fade,
   });
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { errorMsg } = useSelector((state) => state.auth);
+  const { email, firstName, lastName, password } = signupState;
 
-  const inputHandler = ({ target }, param) => {
-    const value = _.get(target, 'value');
-    switch (param) {
-      case 'email':
-        setEmail(value);
-        break;
-      case 'name':
-        setName(value);
-        break;
-      case 'lastName':
-        setLastName(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      default:
-        break;
-    }
+  const inputHandler = ({ target }) => {
+    const { name, value } = target;
+    setSignupState(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
-  const addUser = async () => {
-    try {
-      await axios.post('http://localhost:8000/auth/signup', { email, name, lastName, password });
-      setName('');
-      setLastName('');
-      props.history.push('/login');
-    } catch (err) {
-      setError(err.response.data.errors[0].msg);
-      setDisplayError({
-        open: true,
-        Transition: Fade,
-      });
+  const addUserHandler = () => {
+    const data = {
+      email,
+      name: firstName,
+      lastName,
+      password
     }
+    dispatch(authorizationActions.register(data));
   }
 
   const handleClose = () => {
@@ -119,7 +107,7 @@ const SignUp = props => {
                 id="firstName"
                 label="First Name"
                 autoFocus
-                onChange={(event) => inputHandler(event, 'name')}
+                onChange={inputHandler}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -131,7 +119,7 @@ const SignUp = props => {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lname"
-                onChange={(event) => inputHandler(event, 'lastName')}
+                onChange={inputHandler}
               />
             </Grid>
             <Grid item xs={12}>
@@ -143,7 +131,7 @@ const SignUp = props => {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                onChange={(event) => inputHandler(event, 'email')}
+                onChange={inputHandler}
               />
             </Grid>
             <Grid item xs={12}>
@@ -156,7 +144,7 @@ const SignUp = props => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                onChange={(event) => inputHandler(event, 'password')}
+                onChange={inputHandler}
               />
             </Grid>
             <Grid item xs={12}>
@@ -171,7 +159,7 @@ const SignUp = props => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={addUser}
+            onClick={addUserHandler}
           >
             Sign Up
           </Button>
@@ -192,7 +180,7 @@ const SignUp = props => {
           ContentProps={{
             'aria-describedby': 'message-id',
           }}
-          message={<span id="message-id">{ error }</span>}
+          message={<span id="message-id">{ errorMsg }</span>}
         />
       </div>
     </Container>

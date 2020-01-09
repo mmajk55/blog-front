@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link, Switch, Route } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
+import { authorizationActions } from '../Auth/duck'
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -64,17 +66,24 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-const Blog = props => {
+const Blog = ({ history }) => {
   const classes = useStyles();
+  const { token, expiryDate } = useSelector((state) => state.auth);
+  const dispatch = useDispatch()
+
+  const logoutHandler = () => {
+    dispatch(authorizationActions.logout())
+    history.push('/')
+  }
 
   return (
     <React.Fragment>
       <CssBaseline />
       <Container maxWidth="lg">
         <Toolbar className={classes.toolbar}>
-          <Link to='/panel/dashboard'>
+          {token && <Link to='/panel/dashboard'>
             <Button size="small">Panel</Button>
-          </Link>
+          </Link>}
           <Link
             to='/'
             noWrap
@@ -91,16 +100,22 @@ const Blog = props => {
               Blog
             </Typography>
           </Link>
-          <Link to='signup'>
-            <Button color="secondary" size="small">
-              Sign up
-            </Button>
-          </Link>
-          <Link to='login'>
-            <Button color="secondary" size="small">
-              Login
-            </Button>
-          </Link>
+          {
+            !token
+              ? <React.Fragment>
+                <Link to='/signup'>
+                  <Button color="secondary" size="small">
+                    Sign up
+                  </Button>
+                </Link>
+                <Link to='/login'>
+                  <Button color="secondary" size="small">
+                    Login
+                  </Button>
+                </Link>
+              </React.Fragment>
+              : <Button onClick={logoutHandler}>Logout</Button>
+          }
         </Toolbar>
         <main className='blog'>
           {/* Sub featured posts */}

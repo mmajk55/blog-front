@@ -1,32 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { blogActions } from '../duck';
 import _ from 'lodash';
-import axios from 'axios';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 
 const Post = props => {
-  const [post, setPost] = useState(undefined);
   const [postId, setPostId] = useState(undefined);
+  const dispatch = useDispatch();
+  const post  = useSelector((state) => state.blog.post);
 
   useEffect(() => {
     const { match } = props;
     const id = _.get(match, 'params.id');
     setPostId(id);
-    getPost();
+    dispatch(blogActions.fetchSinglePost(postId));
   }, [postId])
-
-  const getPost = async () => {
-    try {
-      if (!_.isEmpty(postId)) {
-        const { data: { post } } = await axios.get(`http://localhost:8000/blog/post/${postId}`);
-        setPost(post);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   return (
     <React.Fragment>

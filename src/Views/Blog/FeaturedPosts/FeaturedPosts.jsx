@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { blogActions } from '../duck';
 import { makeStyles } from '@material-ui/core/styles';
 import _ from 'lodash';
-import axios from 'axios';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
@@ -57,24 +59,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const FeaturedPosts = props => {
-  const [posts, setPosts] = useState(undefined);
-  const [loading, setLoading] = useState(false);
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { posts, loading, error } = useSelector((state) => state.blog);
 
   useEffect(() => {
-    fetchPosts();
+    dispatch(blogActions.fetchPosts())
   }, [])
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const { data: { posts } } = await axios.get('http://localhost:8000/blog/posts');
-      setPosts(posts);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-    }
-  }
 
   return (
     <React.Fragment>
@@ -82,38 +73,40 @@ const FeaturedPosts = props => {
         posts && !loading
           ? _.map(posts, ({ title, content, date, id }) => (
             <Grid item key={id} xs={12} md={6}>
-              <CardActionArea href={`/post/${id}`}>
-                <Card className={classes.card}>
-                  <div className={classes.cardDetails}>
-                    <CardContent>
-                      <Typography component="h2" variant="h5">
-                        {!_.isEmpty(title) &&
-                          title
-                        }
-                      </Typography>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        {!_.isEmpty(date) &&
-                          new Intl.DateTimeFormat('en-EN', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: '2-digit'
-                          }).format(new Date(date))
-                        }
-                      </Typography>
-                      <Typography variant="subtitle1" paragraph>
-                        {!_.isEmpty(content) &&
-                          _.truncate(content, {
-                            'length': 50,
-                            'separator': ' '
-                          })
-                        }
-                      </Typography>
-                      <Typography variant="subtitle1" color="primary">
-                        Continue reading...
+              <CardActionArea>
+                <Link to={`/post/${id}`}>
+                  <Card className={classes.card}>
+                    <div className={classes.cardDetails}>
+                      <CardContent>
+                        <Typography component="h2" variant="h5">
+                          {!_.isEmpty(title) &&
+                            title
+                          }
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                          {!_.isEmpty(date) &&
+                            new Intl.DateTimeFormat('en-EN', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: '2-digit'
+                            }).format(new Date(date))
+                          }
+                        </Typography>
+                        <Typography variant="subtitle1" paragraph>
+                          {!_.isEmpty(content) &&
+                            _.truncate(content, {
+                              'length': 50,
+                              'separator': ' '
+                            })
+                          }
+                        </Typography>
+                        <Typography variant="subtitle1" color="primary">
+                          Continue reading...
                   </Typography>
-                    </CardContent>
-                  </div>
-                </Card>
+                      </CardContent>
+                    </div>
+                  </Card>
+                </Link>
               </CardActionArea>
             </Grid>
           ))

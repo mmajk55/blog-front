@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector, useDispatch } from 'react-redux';
+import { panelActions } from '../duck';
+import { blogActions } from '../../Blog/duck';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import axios from 'axios';
 import Loader from 'react-loader-spinner';
 import queryString from 'query-string';
 import _ from 'lodash';
@@ -19,25 +21,43 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AddPost = props => {
+const AddEditPost = ({ location }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [postId, setPostId] = useState(undefined);
+  const [editingState, setEditingState] = useState({
+    postId: undefined,
+    editing: false
+  });
+  const classes = useStyles();
+
+  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
+  const editedPost  = useSelector((state) => state.blog.post);
+  const { post, loading, error } = useSelector((state) => state.panel);
+  const { postId, editing } = editingState;
+  const { fetchSinglePost } = blogActions;
+  const { addPost, editPost } = panelActions;
 
   useEffect(() => {
-    if (_.isEmpty(props.location.search)) {
+    if (_.isEmpty(location.search)) {
       return;
     }
-    const paramsString = queryString.parse(props.location.search);
+    const paramsString = queryString.parse(location.search);
     const { editing, postId } = paramsString;
-    setEditing(editing); 
-    setPostId(postId);
+    setEditingState(prevState => ({
+      ...prevState,
+      postId,
+      editing
+    }))
     getPost(postId);
-  }, [props.location.search])
+  }, [location.search])
 
-  const classes = useStyles();
+  useEffect(() => {
+    if (editedPost) {
+      setTitle(editedPost.title);
+      setContent(editedPost.content);
+    }
+  }, [editedPost]);
 
   const titleHandler = ({ target }) => {
     setTitle(_.get(target, 'value'));
@@ -47,50 +67,27 @@ const AddPost = props => {
     setContent(_.get(target, 'value'));
   }
 
-  const addPost = async () => {
-    setLoading(true);
-    try {
-      await axios.post('http://localhost:8000/blog/post', 
-        { title, content },
-        { headers: {
-          Authorization: 'Bearer ' + props.token
-        }}
-      );
-      setLoading(false);
-      setContent('');
-      setTitle('');
-      props.history.push('/panel/dashboard');
-    } catch (err) {
-      setLoading(false);
-      console.log(err);
+  const addPostHandler = () => {
+    const post = {
+      title,
+      content,
+      token
     }
+    dispatch(addPost(post));
   }
 
-  const updatePost = async () => {
-    setLoading(true);
-    try {
-      await axios.put(`http://localhost:8000/blog/update-post/${postId}`, { title, content });
-      setLoading(false);
-      props.history.push('/panel/dashboard');
-    } catch (err) {
-      setLoading(false);
-      console.log(err);
+  const updatePostHandler = () => {
+    const post = {
+      title,
+      content,
+      token,
+      postId
     }
+    dispatch(editPost(post))
   }
 
-  const getPost = async postId => {
-    setLoading(true);
-    try {
-      const { data: { post } } = await axios.get(`http://localhost:8000/blog/post/${postId}`);
-      const title = _.get(post, 'title');
-      const content = _.get(post, 'content');
-      setLoading(false);
-      setContent(content);
-      setTitle(title);
-    } catch (err) {
-      setLoading(false);
-      console.log(err);
-    }
+  const getPost = postId => {
+    dispatch(fetchSinglePost(postId));
   }
 
   return (
@@ -128,14 +125,15 @@ const AddPost = props => {
                 variant="contained"
                 color="primary"
                 style={{ margin: 8 }}
-                onClick={updatePost}>
+                onClick={updatePostHandler}
+                >
                 Update Post
             </Button>
             : <Button
                 variant="contained"
                 color="primary"
                 style={{ margin: 8 }}
-                onClick={addPost}>
+                onClick={addPostHandler}>
                 Add Post
           </Button>
         }
@@ -153,4 +151,4 @@ const AddPost = props => {
   );
 }
 
-export default AddPost;
+export default AddEditPost;

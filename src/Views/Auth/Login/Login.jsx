@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { authorizationActions } from '../duck';
+import { Link } from 'react-router-dom';
 import _ from 'lodash';
-import axios from 'axios';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
@@ -39,43 +40,48 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Login = props => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState(undefined);
-  const [displayError, setDisplayError] = React.useState({
+const Login = () => {
+  const [loginState, setLoginState] = useState({
+    email: undefined,
+    password: undefined
+  });
+  const [displayError, setDisplayError] = useState({
     open: false,
     Transition: Fade,
   });
+  const [error, setError] = useState(undefined);
+  
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const { errorMsg, loginStatus } = useSelector((state) => state.auth);
 
-  const inputHandler = ({ target }, param) => {
-    const value = _.get(target, 'value');
-    switch (param) {
-      case 'email':
-        setEmail(value);
-        break;
-      case 'password':
-        setPassword(value);
-        break;
-      default:
-        break;
-    }
-  }
-
-  const loginUser = async () => {
-    try {
-      const { data } = await axios.post('http://localhost:8000/auth/login', { email, password });
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId);
-      props.history.push('/');
-    } catch (err) {
-      setError(err.response.data.message);
+  useEffect(() => {
+    if (errorMsg) {
+      setError(errorMsg);
       setDisplayError({
         open: true,
-        Transition: Fade,
-      });
+        Transition: Fade
+      })
     }
+    return () => {
+      setDisplayError({
+        open: false,
+        Transition: Fade
+      })
+    };
+  }, [errorMsg, loginStatus]);
+
+  const loginHandler = () => {
+    const { email, password } = loginState;
+    dispatch(authorizationActions.login({ email, password }));
+  }
+
+  const inputHandler = ({ target }) => {
+    const { name, value } = target;
+    setLoginState(prevState => ({
+      ...prevState,
+      [name]: value
+    }))
   }
 
   const handleClose = () => {
@@ -129,18 +135,18 @@ const Login = props => {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={loginUser}
+            onClick={loginHandler}
           >
             Sign In
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link to="#">
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href="#" variant="body2">
+              <Link to="/signup" >
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

@@ -1,30 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import _ from 'lodash';
-import Blog from './Views/Blog/Blog';
-import Panel from './Views/Panel/Panel';
-import './App.css';
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Router, Route, Switch } from "react-router-dom";
+import { authorizationActions } from './Views/Auth/duck';
+import history from "./history";
+import _ from "lodash";
+import Blog from "./Views/Blog/Blog";
+import Panel from "./Views/Panel/Panel";
+import "./App.css";
 
-function App() {
-  const [accessToken, setAccessToken] = useState(undefined);
+const App = () => {
+  const { token, expiryDate} = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if(!_.isEmpty(token)) {
-      setAccessToken(token);
+    if (expiryDate) {
+      const remainingMilliseconds =
+      new Date(expiryDate).getTime() - new Date().getTime();
+      setTimeout(() => {
+        dispatch(authorizationActions.logout());
+        history.push('/')
+      }, remainingMilliseconds);
     }
-  }, [accessToken])
+  }, [expiryDate]);
 
   return (
     <div className="App">
-      <BrowserRouter>
+      <Router history={history}>
         <Switch>
-          <Route path="/panel" render={props => (
-            <Panel token={accessToken}/>
-          )} />
+          {token && <Route path="/panel" component={Panel} />}
           <Route path="/" component={Blog} />
         </Switch>
-      </BrowserRouter>
+      </Router>
     </div>
   );
 }

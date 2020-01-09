@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { panelActions } from '../duck';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from '../../../Components/Title/Title';
@@ -20,38 +22,22 @@ const useStyles = makeStyles({
   },
 });
 
-const AdminPosts = props => {
-  const [posts, setPosts] = useState(undefined);
-  const [loading, setLoading] = useState(false);
+const AdminPosts = () => {
   const classes = useStyles();
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const { posts, loading, error } = useSelector((state) => state.panel);
+  const { fetchAdminPosts, deletePost } = panelActions;
 
   useEffect(() => {
-    fetchPosts();
-  }, [])  
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const { data: { posts } } = await axios.get('http://localhost:8000/blog/posts');
-      setPosts(posts);
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-    }
+    dispatch(fetchAdminPosts(token))
+  }, [])
+  
+  const deletePostHandler = (postId) => {
+    dispatch(deletePost({ postId, token }))
   }
-
-  const deletePost = async (postId) => {
-    setLoading(true);
-    try {
-      await axios.delete(`http://localhost:8000/blog/delete-post/${postId}`);
-      setPosts(prevState => prevState.filter(post => post.id !== postId));
-      setLoading(false);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   return (
     <Grid container spacing={3}>
@@ -79,7 +65,7 @@ const AdminPosts = props => {
                   <Link to={`/panel/add-post?editing=true&postId=${id}`}>
                     Edit
                   </Link>
-                  <Link to='#' onClick={() => deletePost(id)}>
+                  <Link to='#' onClick={() => deletePostHandler(id)}>
                     Delete
                   </Link>
                 </div>
