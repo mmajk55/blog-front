@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Route, Link, Switch, Redirect } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Route, Link, Switch } from 'react-router-dom';
 import _ from 'lodash';
 import clsx from 'clsx';
 import { makeStyles } from '@material-ui/core/styles';
@@ -25,9 +25,6 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {'Copyright © '}
-      <Link to='/'>
-        Blog
-      </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>

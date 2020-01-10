@@ -22,17 +22,9 @@ const deletePostFailure = createAction("Fetch post failure");
 
 export const panelActions = {
   fetchAdminPosts,
-  fetchAdminPostsSuccess,
-  fetchAdminPostsFailure,
   addPost,
-  addPostSuccess,
-  addPostFailure,
   editPost,
-  editPostSuccess,
-  editPostFailure,
   deletePost,
-  deletePostSuccess,
-  deletePostFailure
 };
 
 const initialState = {

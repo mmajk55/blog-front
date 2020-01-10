@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { authorizationActions } from '../duck';
 import { Link } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 import _ from 'lodash';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -12,7 +13,6 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Snackbar from '@material-ui/core/Snackbar';
 import Fade from '@material-ui/core/Fade';
@@ -140,11 +140,6 @@ const Login = () => {
             Sign In
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link to="#">
-                Forgot password?
-              </Link>
-            </Grid>
             <Grid item>
               <Link to="/signup" >
                 {"Don't have an account? Sign Up"}

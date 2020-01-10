@@ -18,13 +18,8 @@ const registerFailure = createAction("Register failure");
 
 export const authorizationActions = {
   login,
-  loginSuccess,
-  loginFailure,
   logout,
-  logoutSuccess,
   register,
-  registerSuccess,
-  registerFailure
 };
 
 const initialState = {
